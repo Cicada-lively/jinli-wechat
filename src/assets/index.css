@@ -29,11 +29,12 @@ html {
 }
 
 #app{
-  height: 100%;
   background: #f8f8f8;
+  height: 100%;
 }
 #app>div{
   height:100%;
+  padding-bottom: 10px;
 }
 *,
 *:before,

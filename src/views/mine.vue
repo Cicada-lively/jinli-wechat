@@ -1,4 +1,4 @@
-<!--  -->
+<!-- 我的页面 -->
 <template>
   <div>
     <div class="my-info">
@@ -17,19 +17,33 @@
         </div>
           
         <div class="info-bottom">
-          <div class="info-list">
-            <span>23</span>
+          <div class="info-list" @click="validHomeFn()">
+            <span>{{user.valid_count}}</span>
             <p>当前有效信息</p>
           </div>
-          <div class="info-list">
-            <span>890</span>
+          <div class="info-list" @click="historyFn()">
+            <span>{{user.history_count}}</span>
             <p>历史信息</p>
           </div>
         </div>
       </div>
 
+      <div class="vip_wrap">
+          <div class="vip_img">
+            <i class="iconfont icon-VIP"></i>
+            <div class="">
+              <h5>VIP会员</h5>
+              <p>将于 <span style="color: red;">{{user.vip_end_date}}</span> 到期</p>
+            </div>
+          </div>
+          <div class="charge-btn" @click="goBookCharge">
+            立即续费
+          </div>
+      </div>
+
       <div class="mine-list">
-        <ul>
+        <ul >
+          <li></li>
           <li @click="bookLink">
             <div class="left">
               <i class="iconfont icon-dingyue"></i>
@@ -111,7 +125,9 @@ export default {
           sessionStorage.setItem("userInfo", JSON.stringify(res))
         })
       }
-      
+    },
+    validHomeFn(){
+       this.$router.push('/page/index')
     },
     bookLink(){
       this.$router.push('/book/myBookSetting')
@@ -124,6 +140,12 @@ export default {
     },
     contactLink(){
       this.$router.push()
+    },
+    historyFn(){
+      this.$router.push('/book/historyList')
+    },
+    goBookCharge(){
+      this.$router.push("/book/setInfoList")
     }
   }
 }
@@ -131,7 +153,7 @@ export default {
 </script>
 <style lang='less' scoped>
 .info-wrap{
-  width: 100%;padding: 30px;
+  width: 100%;padding: 30px; padding-bottom: 50px;
   background-color: #66b0fd;
   box-sizing: border-box; 
   .info-top{
@@ -188,6 +210,45 @@ export default {
 
     }
   }
+}
+.vip_wrap{
+  width: 94%;
+  padding: 10px 10px;
+  position: absolute;
+  top: 170px;
+  background: #fff;
+  box-shadow: 0 10px 10px rgba(156, 156, 156, 0.1);
+  display: flex;
+  border-radius: 4px;
+  left: 3%;
+  justify-content: space-between;
+  .vip_img{
+    display: flex;
+    i{
+      font-size: 40px;
+      display: inline-block;
+    }
+    div{
+      margin-left: 6px;
+      h5{
+        margin-top: 3px;
+      }
+      p{
+        margin-top: 5px;
+      }
+    }
+  }
+  .charge-btn{
+    padding: 0 18px;
+    background: rgba(139, 195, 74, 1);
+    border-radius: 15px;
+    height: 32px;
+    line-height: 30px;
+    color: #fff;
+    font-size: 14px;
+    margin-top: 5px;
+  }
+  
 }
 .mine-list{
   ul{

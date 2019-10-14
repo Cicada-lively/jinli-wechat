@@ -40,22 +40,22 @@ export default new Router({
         ]
     },
     { path: "/mine/aboutUs",
-    name: "aboutUs",
-    component: () =>
-    import("@/views/childPage/aboutUs"),
-    meta: {title: "关于我们"}
+      name: "aboutUs",
+      component: () =>
+      import("@/views/childPage/aboutUs"),
+      meta: {title: "关于我们"}
     },
     { path: "/mine/help",
-    name: "help",
-    component: () =>
-    import("@/views/childPage/help"),
-    meta: {title: "帮助中心"}
+      name: "help",
+      component: () =>
+      import("@/views/childPage/help"),
+      meta: {title: "帮助中心"}
     },
     { path: "/mine/setInfo",
-    name: "setInfo",
-    component: () =>
-    import("@/views/childPage/setInfo"),
-    meta: {title: "个人资料"}
+      name: "setInfo",
+      component: () =>
+      import("@/views/childPage/setInfo"),
+      meta: {title: "个人资料"}
     },
     {
       path: "/help/detail/:id",
@@ -78,22 +78,34 @@ export default new Router({
         meta: {title: "招采详情"}
     },
     { path: "/mine/book/:type",
-    name: "book",
-    component: () =>
-    import("@/views/childPage/bookSetting"),
-    meta: {title: "订阅设置"}
+      name: "book",
+      component: () =>
+      import("@/views/book/bookSettingWrap"),
+      meta: {title: "订阅设置"}
     },
     { path: "/book/myBookSetting",
-    name: "myBookSetting",
-    component: () =>
-    import("@/views/childPage/myBookSetting"),
-    meta: {title: "招采订阅"}
+      name: "myBookSetting",
+      component: () =>
+      import("@/views/book/myBookSetting"),
+      meta: {title: "招采订阅"}
     },
     { path: "/book/setInfoList",
-    name: "setInfoList",
-    component: () =>
-    import("@/views/childPage/setInfoList"),
-    meta: {title: "招采订阅"}
+      name: "setInfoList",
+      component: () =>
+      import("@/views/book/setInfoList"),
+      meta: {title: "招采订阅"}
+    },
+    { path: "/book/myChargeFee",
+      name: "myChargeFee",
+      component: () =>
+      import("@/views/book/myChargeFee.vue"),
+      meta: {title: "立即续费"}
+    },
+    { path: "/book/historyList",
+      name: "historyList",
+      component: () =>
+      import("@/views/childPage/historyList"),
+      meta: {title: "历史订阅列表"}
     },
     // { path: "/book/bookAddKeywords/:type",
     // name: "bookKeywords",
@@ -102,10 +114,10 @@ export default new Router({
     // meta: {title: "招采订阅"}
     // },
     { path: "/auth",
-    name: "auth",
-    component: () =>
-    import("@/views/childPage/auth"),
-    meta: {title: "鉴权"}
+      name: "auth",
+      component: () =>
+      import("@/views/childPage/auth"),
+      meta: {title: "鉴权"}
     },
 
     

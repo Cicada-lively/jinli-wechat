@@ -50,7 +50,7 @@ export default {
     return {
       pObject: {
           nickname: "",
-          sex: 0,
+          sex: '1',
           phone: "",
           company: ""
       },
@@ -73,24 +73,25 @@ export default {
     getInfo(){
       var pObject = sessionStorage.getItem("userInfo")
       if(pObject){
-        this.pObject = JSON.parse(pObject)
+        this.pObject = JSON.parse(pObject);
+        this.pObject.sex += ''
       } else {
         getUserInfo(getToken()).then(res=>{
           this.pObject = res
+          this.pObject.sex += ''
           sessionStorage.setItem("userInfo", JSON.stringify(res))
         })
       }
     },
     savaInfo(){
-        console.log(this.pObject)
         if(this.pObject.nickname){
             setUserInfo(this.pObject).then(res=>{
-                this.$vux.toast.text(res, 'top')
+                this.$toast(res);
                 sessionStorage.setItem("userInfo", JSON.stringify(this.pObject))
-                // console.log(res)
+                this.$router.push("/page/mine")
             })
         } else {
-            this.$vux.toast.text('请输入昵称', 'top')
+            this.$toast("请输入昵称");
         }
     }
   }

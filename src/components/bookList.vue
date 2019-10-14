@@ -7,7 +7,7 @@
           <span :key="item">&nbsp;{{item}}</span>
         </template>
       </h4>
-      <van-button plain hairline type="info" size="small"  style="margin-right: 10px;" @click="saveSub">保存</van-button>
+      <van-button plain hairline type="info" size="small"  style="margin-right: 10px;" @click="returnHandle()">返回</van-button>
     </van-row>
     <ul class="list">
       <li @click="settingItemFn('area')" @saveArea="areaHandle">
@@ -17,7 +17,7 @@
                 <span>地区</span>
             </div>
             <div class="tab_list">
-              <template v-if="subObj.area !== undefined && subObj.area.length>0" > <span v-for="item in subObj.area" :key="item.id">&nbsp;{{item.name}}</span></template> <span v-else>无</span>
+              <template v-if="subObj.area != undefined && subObj.area.length>0" > <span v-for="item in subObj.area" :key="item.id">&nbsp;{{item.name}}</span></template> <span v-else>无</span>
                
             </div>
         </div>
@@ -30,7 +30,7 @@
                 <span>行业</span>
             </div>
             <div class="tab_list">
-              <template v-if="subObj.industry !== undefined && subObj.industry.length>0" > <span v-for="sub in subObj.industry" :key="sub.id">&nbsp;{{sub.name}}</span></template> <span v-else>无</span>
+              <template v-if="subObj.industry != undefined && subObj.industry.length>0" > <span v-for="sub in subObj.industry" :key="sub.id">&nbsp;{{sub.name}}</span></template> <span v-else>无</span>
 
             </div>
         </div>
@@ -43,7 +43,7 @@
                 <span>项目类型</span>
             </div>
             <div class="tab_list">
-              <template v-if="subObj.project !== undefined && subObj.project.length>0" > <span v-for="line in subObj.project" :key="line.id">&nbsp;{{line.name}}</span></template> <span v-else>无</span>
+              <template v-if="subObj.project != undefined && subObj.project.length>0" > <span v-for="line in subObj.project" :key="line.id">&nbsp;{{line.name}}</span></template> <span v-else>无</span>
                 <!-- <span v-for="item in optionList.project" :key="item.id">{{item.name}}</span> -->
             </div>
         </div>
@@ -51,7 +51,7 @@
       </li>
     </ul>
     <div style="text-align: center; margin-top: 20px; padding-bottom: 20px;">
-        <van-button type="info" size="small" @click="returnHandle()">返回</van-button>
+        <van-button type="info" size="small"  @click="saveSub">保存</van-button>
       </div>
   </div>
   

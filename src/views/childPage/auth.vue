@@ -1,6 +1,5 @@
 <template>
 <div>
-  
 </div>
 </template>
 
@@ -12,11 +11,24 @@
     name: 'auth',
     data () {
       return {
-        
+        user: {}
       }
     },
-    created(){
-      this.getAuthCode()
+    // created(){
+    //   this.redirectToAuthPageUrl()
+    // },
+    beforeRouteEnter (to, from, next) {
+      next(vm => {
+        // 通过 `vm` 访问组件实例
+        let fromPath = from.path;
+        if(from.path == "/auth" ){
+          fromPath = '/'
+        }
+        if(sessionStorage.getItem("tryButton") ){
+          fromPath = '/book/myBookSetting'
+        }
+        vm.redirectToAuthPageUrl(fromPath)
+      })
     },
     methods: {
       extractQueryParams(url) {
@@ -36,18 +48,26 @@
         }
         return queryParams
       },
-      getAuthCode(){
-        this.redirectToAuthPageUrl()
+      getUserInfoFn(){
+       var user = sessionStorage.getItem("userInfo")
+        if(user){
+          this.user = JSON.parse(user)
+        } else {
+          getUserInfo(getToken()).then(res=>{
+            this.user = res
+            sessionStorage.setItem("userInfo", JSON.stringify(res))
+          })
+        }
       },
-      redirectToAuthPageUrl(){
+      redirectToAuthPageUrl(path){
         let authUrl;
         const queryParams =  this.extractQueryParams(window.location.href)
         let code = queryParams.code;
         let token;
+       
         if(!getToken()){
           if(!code){
             getAuthUrl("http://purchase.pqtech.com.cn/wechat").then(res=>{
-              console.log(res)
               authUrl=res.auth_url
               window.location.href = authUrl
             })
@@ -55,11 +75,23 @@
             getCode(code).then(response=>{
               token = response.token
               setToken(token)
-              window.location.href="http://purchase.pqtech.com.cn/wechat"
+              this.getUserInfoFn();
+              window.location.href="http://purchase.pqtech.com.cn/wechat/#/auth"
             })
           }
         } else {
-          window.location.href="http://purchase.pqtech.com.cn/wechat"
+          if(path == '/book/myBookSetting'){
+            var user = sessionStorage.getItem("userInfo")
+              if(user){
+                var userInfo = JSON.parse(user)
+                var role = userInfo.vip_type
+                if(role != 'Trial'){
+                  path = "/page/index"
+                }
+              }
+          }
+          window.location.href="http://purchase.pqtech.com.cn/wechat/#"+path
+          
         }
         
       },

@@ -22,7 +22,6 @@ service.interceptors.request.use(
     return config
   },
   error => {
-    // Do something with request error
     Promise.reject(error)
   }
 )
@@ -33,17 +32,13 @@ service.interceptors.response.use(
     /**
      * code为非200是抛错 可结合自己业务进行修改
      */
-    console.log(response)
       if(response.status == '200') {
-        console.log(response.data)
         return response.data;
-      } else if (response == '401'){
+      } else if (response.status == '401'){
         Toast('未认证请求');
       } else {
        Toast(response.message);
-        console.log(response)
       }
-    
   },
   error => {
     Toast(error.message);

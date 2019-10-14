@@ -7,10 +7,11 @@
         <div class="list-wrap">
           <div class="sub-list" v-for="(item,index) in fieldArr" :key="item.id">
             <div class="sub-left">订阅{{index + 1}}</div>
-            <div class="sub-mid"  >
-              <template v-for="k in item.keywords" >
-                <span :key="k">{{k}}</span>
-              </template>
+            <div class="sub-mid"  @click="addKeyWords('edit',item.id)">
+              {{item.keywords.join('，')}}
+              <!-- <template v-for="k in item.keywords" >
+                <span :key="k">{{k}}，</span>
+              </template> -->
             </div>
             <em class="iconfont icon-circle-delete close-icon" @click="deleteSubscribe(item.id)"></em>
             <i class="iconfont icon-filter-o sub-right" @click="addKeyWords('edit',item.id)"></i>
@@ -18,7 +19,7 @@
 
           <div class="sub-list" v-for="(item,index) in addFieldArr" :key="`item_${index}}`">
             <div class="sub-left">订阅{{count + index +1}}</div>
-            <div class="sub-mid" @click="deleteAdd(index)">
+            <div class="sub-mid"  @click="addKeyWords('add')">
               <span> </span>
             </div>
             <em class="iconfont icon-circle-delete close-icon" @click="deleteList(index)"></em>
@@ -26,13 +27,13 @@
           </div>
 
           <van-cell>
-            <van-button plain hairline type="primary" size="small" @click="addBookFn" style="margin-left: 63px;">添加</van-button>
+            <van-button plain hairline type="primary" size="small" @click="addBookFn" style="margin-left: 63px;">+ 添加</van-button>
           </van-cell>
         </div>
 
       </div>
-      <div class="cell-btn">
-          <van-button type="info" size="small">下一步</van-button>
+      <div class="cell-btn" style="padding-bottom: 20px;">
+          <van-button type="info" size="small" @click="goSetList">下一步</van-button>
       </div>
     </div>
   </div>
@@ -40,7 +41,7 @@
 
 <script>
 import { getToken } from '@/utils/auth'
-import { subscribesList, subscribesDelete} from '@/api/api.js'
+import { subscribesList, subscribesDelete, rechargesTrial} from '@/api/api.js'
 export default {
   data () {
     return {
@@ -52,25 +53,57 @@ export default {
       }
     };
   },
+  beforeRouteEnter (to, from, next) {
+      next(vm => {
+        // 通过 `vm` 访问组件实例
+        let fromPath = from.path;
+        if(from.path == "/auth" ){
+          rechargesTrial(getToken()).then(res=>{
+              sessionStorage.setItem("userInfo", JSON.stringify(res))
+              })
+        }
+      })
+    },
   created() {
     this.getSubscribesList();
   },
   methods: {
     getSubscribesList(){
+      let user = sessionStorage.getItem("userInfo");
+      if(user){
+        var role = JSON.parse(user).vip_type;
+          if(role == "Expire"){
+            this.$router.push('/extendPage')
+          } 
+      } 
+        
       subscribesList(getToken()).then(res=>{
-        this.fieldArr=res.data;
-        this.count = res.data.length;
+        if(res.data && res.data.length){
+          this.fieldArr=res.data;
+          this.count = res.data.length;
+        }
+        else {
+          this.addFieldArr.push(this.subListObj)
+        }
       })
+      if(sessionStorage.getItem("tryButton")){
+        sessionStorage.removeItem("tryButton")
+      }
+        
     },
     addBookFn(){
       this.addFieldArr.push(this.subListObj)
-      console.log(this.fieldArr)
     },
     deleteSubscribe(id) {
-      subscribesDelete(getToken(),id).then( res => {
-        this.$toast(res)
-        console.log(res)
-      })
+      if(this.fieldArr.length>1){
+        subscribesDelete(getToken(),id).then( res => {
+          this.$toast(res)
+          this.getSubscribesList()
+        })
+      } else {
+        this.$toast("必须有一个订阅设置")
+      }
+      
     },
     deleteList(num){
       this.addFieldArr.splice(num,1)
@@ -81,7 +114,9 @@ export default {
       }else {
         this.$router.push('/mine/book/'+type)
       }
-      
+    },
+    goSetList(){
+      this.$router.push("/book/setInfoList")
     }
   }
 }

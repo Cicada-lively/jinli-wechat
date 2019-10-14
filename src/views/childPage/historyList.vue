@@ -43,23 +43,9 @@ export default {
       finished: false
     };
   },
-  mounted(){
-    this.pageHrefFn()
-  },
   methods: {
-    pageHrefFn(){
-      let user = sessionStorage.getItem("userInfo");
-      var role = JSON.parse(user).vip_type;
-				if(role == "Vip" || role == 'Trial'){
-				} else if(role == "Expire"){
-          alert(1)
-					this.$router.push('/extendPage')
-				} else {
-					this.$router.push('/extendPage')
-				}
-    },
     getPurchasesList(){
-      getPurchases("",this.page).then(res=>{
+      getPurchases("",this.page, 1).then(res=>{
         this.total = res.meta.last_page
         this.page++;
         this.purchasesList = this.purchasesList.concat(res.data);
@@ -84,9 +70,6 @@ export default {
 
 </script>
 <style lang='less' scoped>
-#app{
-  height: 100%;
-}
 .wrapper{
   width: 100%;
   overflow: auto;
@@ -94,7 +77,6 @@ export default {
 }
 .van-list{
   position: absolute;
-  width: 100%;
 }
 .van-pull-refresh{
   height: 100%;

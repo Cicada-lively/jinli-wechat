@@ -47,14 +47,12 @@ export default {
           this.fieldArr=res.data;
           this.fieldArr.find(item => {
             if(item.id == this.editId){
-              console.log(this.subObj)
               return this.subObj= item
             }
           })
-
         })
       } else {
-        this.subObj.keywords.push(this.keywordsArr)
+        this.subObj.keywords.push('')
       }
     },
   }

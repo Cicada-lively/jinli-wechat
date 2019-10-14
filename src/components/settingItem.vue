@@ -6,7 +6,7 @@
           <span :key="item">{{item}}</span>
         </template>
       </h4>
-      <van-button plain hairline type="info" size="small"  @click="saveSubFn">保存</van-button>
+      <van-button plain hairline type="info" size="small"  @click="returnHandle()">返回</van-button>
     </van-row>
 
     <div class="content">
@@ -27,6 +27,7 @@
         <div class="setting-up-btn iconfont icon-arrow-right" :class="sub.showFlag? 'downIcon': ''"  @click="handleClick(sub.id)"></div>
         <div class="setting-title" >
           <button :val="sub.id" @click="addTubArrHandle(sub.id)" :class="sub.selectFlag? 'selectGreen': ''">{{sub.name}}</button>
+          <div style="flex-grow:1" @click="handleClick(sub.id)"></div>
         </div>
         <div class="setting-child-box" v-show="sub.showFlag">
           <template v-for="item in sub.children">
@@ -40,7 +41,7 @@
         </div>
       </div>
       <div style="text-align: center; margin-top: 20px; padding-bottom: 20px;">
-        <van-button type="info" size="small" @click="returnHandle()">返回</van-button>
+        <van-button type="info" size="small" @click="saveSubFn">保存 </van-button>
       </div>
     </div>
   </div>
@@ -85,6 +86,7 @@ export default {
     getListFn(){
       getOption().then(res=>{
         this.listArr = res[this.param];
+         console.log(this.listArr)
         for(var i=0; i<this.listArr.length; i++){
           this.$set(this.listArr[i],"showFlag",false)
           this.$set(this.listArr[i],"selectFlag",false)
@@ -101,35 +103,39 @@ export default {
               }
             }
           } else {
+            console.log(this.param)
             for(let item of this.subObj.project){
               if(item.id == this.listArr[i].id){
                 this.$set(this.listArr[i],"selectFlag",true)
               }
             }
           }
-
-          for(let j=0; j<this.listArr[i].children.length; j++){
-            this.$set(this.listArr[i].children[j],"selectFlag",false)
-             if(this.param == "area"){
-              for(let item of this.subObj.area){
-                if(item.id == this.listArr[i].children[j].id){
-                  this.$set(this.listArr[i].children[j],"selectFlag",true)
+          if(this.listArr[i].children){
+            for(let j=0; j<this.listArr[i].children.length; j++){
+              this.$set(this.listArr[i].children[j],"selectFlag",false)
+              if(this.param == "area"){
+                for(let item of this.subObj.area){
+                  if(item.id == this.listArr[i].children[j].id){
+                    this.$set(this.listArr[i].children[j],"selectFlag",true)
+                  }
                 }
-              }
-            } else if(this.param == "industry"){
-              for(let item of this.subObj.industry){
-                if(item.id == this.listArr[i].children[j].id){
-                  this.$set(this.listArr[i].children[j],"selectFlag",true)
+              } else if(this.param == "industry"){
+                for(let item of this.subObj.industry){
+                  if(item.id == this.listArr[i].children[j].id){
+                    this.$set(this.listArr[i].children[j],"selectFlag",true)
+                  }
                 }
-              }
-            } else {
-              for(let item of this.subObj.project){
-                if(item.id == this.listArr[i].children[j].id){
-                  this.$set(this.listArr[i].children[j],"selectFlag",true)
+              } else {
+                for(let item of this.subObj.project){
+                  if(item.id == this.listArr[i].children[j].id){
+                    this.$set(this.listArr[i].children[j],"selectFlag",true)
+                  }
                 }
               }
             }
           }
+          
+
         }
       })
     },
@@ -145,11 +151,13 @@ export default {
         if(this.listArr[i].selectFlag){
           this.optionList.push({id: this.listArr[i].id, "name": this.listArr[i].name})
         }
-         for(var j=0; j<this.listArr[i].children.length; j++){
-           if(this.listArr[i].children[j].selectFlag){
-              this.optionList.push({id:this.listArr[i].children[j].id,"name": this.listArr[i].children[j].name})
-           }
-         }
+          if(this.listArr[i].children){
+            for(var j=0; j<this.listArr[i].children.length; j++){
+            if(this.listArr[i].children[j].selectFlag){
+                this.optionList.push({id:this.listArr[i].children[j].id,"name": this.listArr[i].children[j].name})
+            }
+          }
+        }
       }
       if(this.param == "area"){
         this.subObj.area = this.optionList;
@@ -172,12 +180,15 @@ export default {
     },
     addSubArrFn(id){
       for(var i=0; i<this.listArr.length; i++){
-        this.listArr[i].children.find((item,index) => {
-          if(item.id == id){
-            this.$set(this.listArr[i].children[index],"selectFlag",!this.listArr[i].children[index]["selectFlag"])
-            return
-          }
-        })
+        if(this.listArr[i].children) {
+          this.listArr[i].children.find((item,index) => {
+            if(item.id == id){
+              this.$set(this.listArr[i].children[index],"selectFlag",!this.listArr[i].children[index]["selectFlag"])
+              return
+            }
+          })
+        }
+        
       }
     },
     returnHandle(){
@@ -222,6 +233,7 @@ export default {
   &-title{
     position: relative;
     margin-top: 10px;
+    display: flex;
     span{
       position: absolute;
       top: 10px;

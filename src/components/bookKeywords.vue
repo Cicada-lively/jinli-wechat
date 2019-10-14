@@ -4,7 +4,7 @@
     <div class="article">
       <van-row type="flex" justify="space-between" style="padding: 10px 0;">
         <h4>订阅关键词</h4>
-        <van-button plain hairline type="info" size="small"  style="margin-right: 10px;" @click="saveSub">保存</van-button>
+        <van-button plain hairline type="info" size="small"  style="margin-right: 10px;" @click="returnHandle()">返回</van-button>
       </van-row>
 
       <div class="keywords-wrap">
@@ -14,7 +14,7 @@
           <i class="iconfont icon-circle-delete" @click="deleteKeys(index)"></i>
         </div>
         <div style="padding-left: 70px; margin-top: 20px;">
-          <van-button plain hairline type="primary" size="small" @click="addKeysFn">添加</van-button>
+          <van-button plain hairline type="primary" size="small" @click="addKeysFn">+ 添加</van-button>
         </div>
       </div>
 
@@ -29,12 +29,15 @@
           </span>
         </div>
         <div class="setting-content">
-            <p>地区：<template v-if="subObj.area !== undefined && subObj.area.length>0" > <span v-for="item in subObj.area" :key="item.id">&nbsp;{{item.name}}</span></template> <span v-else>无</span></p>
-            <p>行业：<template v-if="subObj.industry !== undefined && subObj.industry.length>0" > <span v-for="sub in subObj.industry" :key="sub.id">&nbsp;{{sub.name}}</span></template> <span v-else>无</span> </p>
-            <p>项目类型：<template v-if="subObj.project !== undefined && subObj.project.length>0" > <span v-for="line in subObj.project" :key="line.id">&nbsp;{{line.name}}</span></template> <span v-else>无</span></p> 
+            <p>地区：<template v-if="subObj.area !== undefined && subObj.area.length>0" > <span v-for="item in subObj.area" :key="item.id">&nbsp;{{item.name}}</span></template> <span v-else>不限</span></p>
+            <p>行业：<template v-if="subObj.industry !== undefined && subObj.industry.length>0" > <span v-for="sub in subObj.industry" :key="sub.id">&nbsp;{{sub.name}}</span></template> <span v-else>不限</span> </p>
+            <p>项目类型：<template v-if="subObj.project !== undefined && subObj.project.length>0" > <span v-for="line in subObj.project" :key="line.id">&nbsp;{{line.name}}</span></template> <span v-else>不限</span></p> 
         </div>
       </div>
-      
+      <div style="text-align: center; margin-top: 20px; padding-bottom: 20px;">
+        <van-button type="info" size="small" @click="saveSub">保存 </van-button>
+      </div>
+
     </div>
   </div>
 </template>
@@ -48,7 +51,6 @@ export default {
       fieldList:  {},
       keywordsArr: [''],
       list: null,
-     
     };
   },
   props: {
@@ -65,9 +67,14 @@ export default {
   methods: {
     addKeyWords(e) {
       let val = e.target.value;
-      if(val){
+      if(this.subObj.keywords.length == 1){
+        if(val){
+          this.subObj.keywords[0] = val;
+        }
+      } else {
         this.subObj.keywords.push(val);
       }
+      
     },
     // 点击添加按钮
     addKeysFn(){
@@ -83,17 +90,18 @@ export default {
     },
     saveSub() {
       let optionArr = []
-      if(this.subObj.area.length){
+      console.log(this.subObj.area)
+      if(this.subObj.area && this.subObj.area.length){
         for(let item of this.subObj.area){
           optionArr.push(item.id)
         }
       }
-      if(this.subObj.project.length){
+      if(this.subObj.project && this.subObj.project.length){
         for(let item of this.subObj.project){
           optionArr.push(item.id)
         }
       }
-      if(this.subObj.industry.length){
+      if(this.subObj.industry && this.subObj.industry.length){
         for(let item of this.subObj.industry){
           optionArr.push(item.id)
         }
@@ -101,22 +109,30 @@ export default {
       this.subObj.option_ids = optionArr
       this.fieldList.keywords = this.subObj.keywords;
       this.fieldList.option_ids = optionArr;
-      if(this.type == "edit"){
-        subscribesUpdate(getToken(),this.editId, this.fieldList).then(res => {
-          this.$toast(res)
-          this.$router.push("/book/myBookSetting")
-        })
+      if(this.subObj.keywords.length == 1 && this.subObj.keywords[0] == ''){
+        this.$toast("必须有一个关键字！")
       } else {
-        subscribesAdd(getToken(),this.fieldList).then(res => {
-          this.$toast(res)
-          this.$router.push("/book/myBookSetting")
-        })
+         if(this.type == "edit"){
+          subscribesUpdate(getToken(),this.editId, this.fieldList).then(res => {
+            this.$toast(res)
+            this.$router.push("/book/myBookSetting")
+          })
+        } else {
+          subscribesAdd(getToken(),this.fieldList).then(res => {
+            this.$toast(res)
+            this.$router.push("/book/myBookSetting")
+          })
+        }
       }
+      
       
     },
     hrefPathFn(){
       this.$emit("update:showNum", 2)
       this.$emit("update:keywords",this.subObj.keywords)
+    },
+    returnHandle(){
+      this.$router.push("/book/myBookSetting")
     }
   }
 }

@@ -4,19 +4,17 @@
     </div>
     <div v-html="content" class="content">
     </div>
-    <div class="button-group">
-      <button class="introduce" @click="introduceFn">招采介绍</button>
-      <button class="dingyue"  @click="dingyueFn">立即订阅</button>
-    </div>
+    
     <div >
-      <van-swipe :height="121" vertical :autoplay="3000" :show-indicators="false">
-        <van-swipe-item v-for="(item,i) in purchasesList" :key="item.id">
-          <div class="pannel"  @click="detailPageFn(item.id)" >
+      <h5 style="text-align: center; margin-top: 10px; height: 30px; line-height: 30px;">采购信息预览</h5>
+      <van-swipe :height="100" vertical :autoplay="3000" :show-indicators="false" :touchable="true">
+        <van-swipe-item v-for="(item,i) in purchasesList" :key="item.id" @click.prevent="detailPageFn(item.id)">
+          <div class="pannel"   >
           <p class="title">{{item.title}}</p>
           <div class="key-tag-group">
-            <div class="key-tag primary">{{purchasesList[i].area_name}}</div>
-            <div class="key-tag warning">{{purchasesList[i].industry_name}}</div>
-            <div class="key-tag success">{{purchasesList[i].project_name}}</div>
+            <div class="key-tag primary" v-if="purchasesList[i].area_name">{{purchasesList[i].area_name}}</div>
+            <div class="key-tag warning" v-if="purchasesList[i].industry_name">{{purchasesList[i].industry_name}}</div>
+            <div class="key-tag success" v-if="purchasesList[i].project_name">{{purchasesList[i].project_name}}</div>
           </div>
           <div class="create-time">
             <i class="iconfont icon-time"></i>
@@ -27,7 +25,12 @@
         </van-swipe-item>
       </van-swipe>
     </div>
-    
+    <div class="button-group">
+      <button class="introduce" @click="introduceFn">招采介绍</button>
+      <button v-if="buttonType" class="dingyue"  @click="dingyueFn">立即试用1</button>
+      <button v-if="!buttonType" class="dingyue"  @click="chargeFn">立即续费1</button>
+    </div>
+    <p v-if="buttonType" style="text-align: center; padding-bottom: 20px;">免费试用有效期至{{lastDate}}</p>
   </div>
 </template>
 
@@ -38,7 +41,8 @@
   // 引入提示框和标题组件
   require('echarts/lib/component/title');
   require('echarts/lib/component/tooltip');
-import {getOverview } from '@/api/api.js'
+  import { getToken } from '@/utils/auth'
+import {getOverview, rechargesTrial } from '@/api/api.js'
 export default {
   name: 'extendPage',
   data () {
@@ -49,14 +53,14 @@ export default {
       total: "",
       i:0,
       echartData: [],
+      endDate:'',
+      buttonType: true,
+      lastDate: ''
     }
   },
-
   created(){
-    this.getPurchasesFn()
-  },
-  mounted(){
-    
+    this.getPurchasesFn();
+    this.getCurrentMonthLast();
   },
   methods: {
     getPurchasesFn(){
@@ -68,6 +72,17 @@ export default {
           this.initChart()
         })
       })
+      let userInfo =  sessionStorage.getItem("userInfo")
+      if(userInfo){
+          if( JSON.parse(userInfo).vip_type == 'Anonymous'){
+            this.buttonType = true
+          } else {
+            this.buttonType = false
+          }
+      } else {
+         this.buttonType = true
+      }
+      
     },
     initChart() {
       const dateArr = this.echartData.map(item => {
@@ -82,7 +97,8 @@ export default {
       var option = {
         color: ["#39a9ed"],
         tooltip: {
-            trigger: 'axis'
+            trigger: 'axis',
+            show: true
         },
         grid: {
           left: '3%',
@@ -122,14 +138,40 @@ export default {
       };
       myChart.setOption(option)
     },
+    getCurrentMonthLast(){
+        var date=new Date();
+        var currentMonth=date.getMonth();
+        var nextMonth=++currentMonth;
+        var nextMonthFirstDay=new Date(date.getFullYear(),nextMonth,1);
+        var oneDay=1000*60*60*24;
+        var lastTime = new Date(nextMonthFirstDay-oneDay);
+        var month = parseInt(lastTime.getMonth()+1);
+        var day = lastTime.getDate();
+        if (month < 10) {
+            month = '0' + month
+        }
+        if (day < 10) {
+            day = '0' + day
+        }
+        this.lastDate = date.getFullYear() + '-' + month + '-' + day;
+    },
     detailPageFn(id){
       this.$router.push("/purchasesDetail/"+id)
     },
     introduceFn(){
-      this.$router.push("/page/index")
+      this.$router.push("/mine/aboutUs")
     },
     dingyueFn(){
-      this.$router.push("/mine/book")
+      if(getToken()){
+         rechargesTrial(getToken()).then(res=>{
+          sessionStorage.setItem("userInfo", JSON.stringify(res))
+        })
+      } 
+      sessionStorage.setItem("tryButton", true)
+      this.$router.push("/book/myBookSetting")
+    },
+    chargeFn(){
+      this.$router.push("/book/myChargeFee")
     }
   }
 }
@@ -146,11 +188,10 @@ export default {
   width: 100%;
   &>div{
     width: 100%;
-    // margin: 0 auto;
   }
 }
 .van-swipe{
-  height:242px
+  height:200px
 }
 .button-group{
   width: 100%;
@@ -180,15 +221,17 @@ export default {
   position: relative;
   padding: 14px 0 4px;
   overflow: hidden;
-  margin-top: 10px;
+  margin-bottom: 7px;
   background-color: #fff;
   .title{
     padding: 0 20px;
     font-size: 14px;
     line-height: 1.5;
     margin-bottom: 10px;
-    height:43px;
+    height:23px;
     overflow: hidden;
+    text-overflow:ellipsis; //溢出用省略号显示
+    white-space:nowrap; //溢出不换行
   }
   .key-tag-group{
     padding-left: 20px;

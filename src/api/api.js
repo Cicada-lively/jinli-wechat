@@ -31,13 +31,14 @@ export function getAuthUrl(path) {
   })
 }
 // 招采列表
-  export function getPurchases(keyword,page) {
+  export function getPurchases(keyword,page, history_subscribe) {
     return request({
       url: '/api/purchases',
       method: 'get',
       params: {
         keyword,
-        page
+        page,
+        history_subscribe
       }
     })
   }
@@ -145,6 +146,41 @@ export function subscribesDelete(token,id) {
     headers: {
       "Content-Type": "application/json",
       'Authorization': 'Bearer '+token
+    }
+  })
+}
+// 试用vip
+export function rechargesTrial(token) {
+  return request({
+    url: '/api/recharges/trial',
+    method: 'post',
+    headers: {
+      'Authorization': 'Bearer '+token
+    }
+  })
+}
+// 获取续费价格
+export function rechargesPrice(token) {
+  return request({
+    url: '/api/recharges/price',
+    method: 'GET',
+    headers: {
+      "Content-Type": "application/json",
+      'Authorization': 'Bearer '+token
+    }
+  })
+}
+// 获取微信支付参数
+export function rechargesPrepay(token,months) {
+  return request({
+    url: '/api/recharges/prepay',
+    method: 'GET',
+    headers: {
+      "Content-Type": "application/json",
+      'Authorization': 'Bearer '+token
+    },
+    params: {
+      months
     }
   })
 }

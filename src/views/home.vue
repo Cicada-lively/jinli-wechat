@@ -52,12 +52,12 @@ export default {
 }
 
 </script>
-<style lang='less'>
+<style lang='less' scope>
 .pannel{
   position: relative;
   padding: 8px 0 4px;
   overflow: hidden;
-  margin-top: 10px;
+  margin-bottom: 10px;
   background-color: #fff;
   .title{
     padding: 0 20px;
