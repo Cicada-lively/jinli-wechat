@@ -10,7 +10,7 @@
           <i class="iconfont icon-VIP"></i>
           <div class="">
             <h5>VIP会员</h5>
-            <p>将于 <span style="color: red;">{{user.vip_end_date}}</span> 到期</p>
+            <p> <span v-if="dateFlag">已于</span> <span v-else>将于</span>  <span style="color: red;">{{user.vip_end_date}}</span> 到期</p>
           </div>
         </div>
         <div class="charge-btn" @click="editBookSetting">
@@ -48,7 +48,8 @@
     
     
     <div style="margin-top: 10px; text-align: center;">
-        <van-button type="info" size="small" @click="addBookFn" >立即订阅</van-button>
+        <van-button type="info" size="small" @click="addBookFn" >立即续费</van-button>
+        <p style="text-align: center; padding-bottom: 20px;">有效期至{{lastDate}}</p>
     </div>
     <div class="agreeBox" style="padding-bottom: 20px;">
         <van-checkbox v-model="checked"> <p>阅读并同意 <router-link to="/agreement">《锦鲤招采服务协议》</router-link> </p></van-checkbox>
@@ -74,12 +75,45 @@ export default {
      checked: true,
      discount_num: 1,
      user:{},
+     dateFlag: true,
     };
   },
   created() {
     this.getSubList();
     this.rechargesPriceFn()
     this.getUserInfoFn()
+  },
+  computed: {
+    lastDate: function(){
+      let now;
+      if(this.dateFlag){
+        now = new Date();
+      } else {
+        now = new Date(+new Date(this.user.vip_end_date.replace(/-/g,'/')) + 24*60*60*1000)
+      }
+      let year = now.getFullYear() ;
+      let month = now.getMonth()+1;
+      let day = now.getDate();
+      let newMonth;
+      // this.discount_num;
+      if(month+this.discount_num<10){
+        newMonth = '0'+ month+this.discount_num
+      }else if(month+this.discount_num>12){
+        newMonth = month+this.discount_num -12
+        year = year + 1;
+        if(newMonth<10){
+          newMonth = '0'+newMonth
+        } 
+      } else {
+        newMonth = month+this.discount_num
+      }
+      var lastdate = new Date((+new Date(year+'/'+ newMonth +'/01 00:00:00'))-60*100)
+      let lastyear = lastdate.getFullYear();
+      let lastmonth = lastdate.getMonth()+1;
+      let lastday = lastdate.getDate();
+      return lastyear+'-'+ lastmonth+'-' +lastday
+    },
+    
   },
   methods: {
     getSubList(){
@@ -102,12 +136,12 @@ export default {
           sessionStorage.setItem("userInfo", JSON.stringify(res))
         })
       }
+      this.dateFlag = +new Date() > +new Date(this.user.vip_end_date.replace(/-/g,'/')) ? true: false;
     },
     addBookFn(){
       if(this.checked){
         rechargesPrepay(getToken(),this.discount_num).then(res => {
           this.onBridgeReady(res)
-        
         })
       }else {
         Toast('请先了解并选中协议');
@@ -131,7 +165,7 @@ export default {
             getUserInfo(getToken()).then(res=>{
               this.user = res
               sessionStorage.setItem("userInfo", JSON.stringify(res))
-              this.$router.push('/')
+              this.$router.push('/page/index')
             })
           } 
       }); 
@@ -258,9 +292,5 @@ export default {
     color: #1989fa
   }
 }
-.van-stepper__input[disabled]{
-  height: 28px;
-  line-height: 28px;
-  color: #555;
-}
+
 </style>

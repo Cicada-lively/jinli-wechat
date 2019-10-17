@@ -58,9 +58,14 @@ export default {
         // 通过 `vm` 访问组件实例
         let fromPath = from.path;
         if(from.path == "/auth" ){
-          rechargesTrial(getToken()).then(res=>{
-              sessionStorage.setItem("userInfo", JSON.stringify(res))
+           if(user){
+            var role = JSON.parse(user).vip_type;
+            if(role == "Anonymous"){
+              rechargesTrial(getToken()).then(res=>{
+                sessionStorage.setItem("userInfo", JSON.stringify(res))
               })
+            } 
+           }
         }
       })
     },
@@ -69,14 +74,13 @@ export default {
   },
   methods: {
     getSubscribesList(){
-      let user = sessionStorage.getItem("userInfo");
-      if(user){
-        var role = JSON.parse(user).vip_type;
-          if(role == "Expire"){
-            this.$router.push('/extendPage')
-          } 
-      } 
-        
+      // let user = sessionStorage.getItem("userInfo");
+      // if(user){
+      //   var role = JSON.parse(user).vip_type;
+      //     if(role == "Expire"){
+      //       this.$router.push('/extendPage')
+      //     } 
+      // } 
       subscribesList(getToken()).then(res=>{
         if(res.data && res.data.length){
           this.fieldArr=res.data;

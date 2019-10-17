@@ -145,7 +145,7 @@ export default {
       this.$router.push('/book/historyList')
     },
     goBookCharge(){
-      this.$router.push("/book/setInfoList")
+      this.$router.push("/book/myChargeFee")
     }
   }
 }

@@ -43,31 +43,24 @@ export default {
       finished: false
     };
   },
-  mounted(){
-    this.pageHrefFn()
+  created(){
+    // this.pageHrefFn()
   },
   methods: {
-    pageHrefFn(){
-      let user = sessionStorage.getItem("userInfo");
-      var role = JSON.parse(user).vip_type;
-				if(role == "Vip" || role == 'Trial'){
-				} else if(role == "Expire"){
-          alert(1)
-					this.$router.push('/extendPage')
-				} else {
-					this.$router.push('/extendPage')
-				}
-    },
+    
     getPurchasesList(){
-      getPurchases("",this.page).then(res=>{
-        this.total = res.meta.last_page
-        this.page++;
-        this.purchasesList = this.purchasesList.concat(res.data);
-         this.loading = false;
-         if (this.page >= this.total) {
-          this.finished = true;
-        }
-      })
+      setTimeout(()=>{
+        getPurchases("",this.page).then(res=>{
+          this.total = res.meta.last_page
+          this.page++;
+          this.purchasesList = this.purchasesList.concat(res.data);
+          this.loading = false;
+          if (this.page >= this.total) {
+            this.finished = true;
+          }
+        })
+      },10)
+      
     },
     detailPageFn(id){
       this.$router.push("/purchasesDetail/"+id)

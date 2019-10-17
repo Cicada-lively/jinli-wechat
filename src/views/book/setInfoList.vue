@@ -43,7 +43,8 @@
       <div class="price-wrap">
         <del>¥ {{this.priceObj.original_price * discount_num}}</del>
         <span>¥ {{this.priceObj.discount_price * (discount_num>10? 10: discount_num)}}</span>
-        <p>有效期至 {{user.vip_end_date}}</p>
+        <!-- <p>有效期至 {{user.vip_end_date}}</p> -->
+        <p> 有效期至 {{lastDate}} </p>
       </div>
       
       
@@ -73,8 +74,40 @@ export default {
      },
      checked: true,
      discount_num: 1,
-     user: {}
+     user: {},
+     dateFlag: true,
     };
+  },
+  computed: {
+    lastDate: function(){
+      let now;
+      if(this.dateFlag){
+        now = new Date();
+      } else {
+        now = new Date(+new Date(this.user.vip_end_date.replace(/-/g,'/')) + 24*60*60*1000)
+      }
+      let year = now.getFullYear() ;
+      let month = now.getMonth()+1;
+      let day = now.getDate();
+      let newMonth;
+      // this.discount_num;
+      if(month+this.discount_num<10){
+        newMonth = '0'+ month+this.discount_num
+      }else if(month+this.discount_num>12){
+        newMonth = month+this.discount_num -12
+        year = year + 1;
+        if(newMonth<10){
+          newMonth = '0'+newMonth
+        } 
+      } else {
+        newMonth = month+this.discount_num
+      }
+      var lastdate = new Date((+new Date(year+'/'+ newMonth +'/01 00:00:00'))-60*100)
+      let lastyear = lastdate.getFullYear();
+      let lastmonth = lastdate.getMonth()+1;
+      let lastday = lastdate.getDate();
+      return lastyear+'-'+ lastmonth+'-' +lastday
+    },
   },
   created() {
     this.getSubList();
@@ -88,7 +121,6 @@ export default {
             this.subList = res.data
         })
     },
-  
     getUserInfoFn(){
       var user = sessionStorage.getItem("userInfo")
       if(user){
@@ -99,6 +131,7 @@ export default {
           sessionStorage.setItem("userInfo", JSON.stringify(res))
         })
       }
+      this.dateFlag = +new Date() > +new Date(this.user.vip_end_date.replace(/-/g,'/')) ? true: false;
     },
     rechargesPriceFn(){
       rechargesPrice(getToken()).then(res => {
@@ -126,14 +159,13 @@ export default {
           'paySign': args.paySign, // 支付签名
         },
         function(res){
-          console.log(res)
           if(res.err_msg == "get_brand_wcpay_request:ok" ){
           // 使用以上方式判断前端返回,微信团队郑重提示：
                 //res.err_msg将在用户支付成功后返回ok，但并不保证它绝对可靠。
             getUserInfo(getToken()).then(res=>{
               this.user = res
               sessionStorage.setItem("userInfo", JSON.stringify(res))
-              this.$router.push('/')
+              this.$router.push('/page/index')
             })
           } 
       }); 

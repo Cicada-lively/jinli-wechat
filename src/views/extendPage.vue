@@ -27,8 +27,8 @@
     </div>
     <div class="button-group">
       <button class="introduce" @click="introduceFn">招采介绍</button>
-      <button v-if="buttonType" class="dingyue"  @click="dingyueFn">立即试用1</button>
-      <button v-if="!buttonType" class="dingyue"  @click="chargeFn">立即续费1</button>
+      <button v-if="buttonType" class="dingyue"  @click="dingyueFn">立即试用</button>
+      <button v-if="!buttonType" class="dingyue"  @click="chargeFn">立即续费</button>
     </div>
     <p v-if="buttonType" style="text-align: center; padding-bottom: 20px;">免费试用有效期至{{lastDate}}</p>
   </div>

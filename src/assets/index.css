@@ -119,3 +119,8 @@ a:hover {
 .booking  .van-hairline--top-bottom::after{
   border-width: 0;
 }
+.van-stepper__input[disabled]{
+  height: 28px;
+  line-height: 28px;
+  color: #555;
+}
